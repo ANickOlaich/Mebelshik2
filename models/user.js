@@ -4,7 +4,7 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // пока пусто
+      // ассоциации потом
     }
   }
 
@@ -31,7 +31,9 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
-    tableName: 'users'
+    tableName: 'users',
+    timestamps: true
+    // underscored: true   ← УДАЛИ эту строку или закомментируй
   });
 
   return User;
