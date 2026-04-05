@@ -25,6 +25,14 @@ app.use('/api', apiRoutes);
 app.use('/api/admin/users', require('./routes/admin/users'));
 app.use('/api/admin/suppliers', require('./routes/admin/suppliers'));
 
+// Отдаём статические файлы Vue
+app.use(express.static('public'));
+
+// Важно! Для Vue Router (History Mode)
+app.get('*', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
 const startServer = async () => {
   try {
     await sequelize.authenticate();
