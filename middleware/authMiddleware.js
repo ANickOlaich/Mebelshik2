@@ -17,6 +17,28 @@ exports.protect = async (req, res, next) => {
   }
 };
 
+//Для статистики
+exports.optionalAuth = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      req.user = null;
+      return next();
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findByPk(decoded.id);
+
+    req.user = user || null;
+    next();
+  } catch (err) {
+    // Любая ошибка (битый токен, истек и т.д.)
+    req.user = null;
+    next();
+  }
+};
+
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {

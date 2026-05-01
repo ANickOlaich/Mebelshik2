@@ -4,7 +4,10 @@ const { Model } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // ассоциации потом
+      User.hasMany(models.Visit, {
+        foreignKey: 'userId',
+        as: 'visits'
+      });
     }
   }
 
@@ -33,7 +36,6 @@ module.exports = (sequelize, DataTypes) => {
     modelName: 'User',
     tableName: 'users',
     timestamps: true
-    // underscored: true   ← УДАЛИ эту строку или закомментируй
   });
 
   return User;

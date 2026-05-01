@@ -2,26 +2,39 @@ const express = require('express');
 const cors = require('cors');
 const db = require('./models');
 const sequelize = db.sequelize;
+const path = require('path');
+const requestLogger = require('./middleware/requestLogger.js');
+const visitTracker = require('./middleware/visitTracker')
 
 require('dotenv').config();
 
 const app = express();
 
+app.use(express.json({ limit: '10mb' }));        // or higher, e.g. '50mb'
+app.use(express.urlencoded({ limit: '10mb', extended: true }));
+
 // Middleware
 app.use(express.json());
 app.use(cors());
 
-// Базовый маршрут
-//app.get('/', (req, res) => res.send('Backend работает!'));
+
+app.use(cors({
+  origin: ['https://mebelshik.com.ua', 'http://mebelshik.com.ua', 'http://localhost:5173'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+
+app.use(requestLogger);
+//app.use(visitTracker)
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // === API РОУТЫ ===
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api', require('./routes/apiRoutes'));           // общие роуты
-
-// Admin роуты (лучше подключать напрямую, а не через /api/admin)
-app.use('/api/admin/users', require('./routes/admin/users'));
-app.use('/api/admin/suppliers', require('./routes/admin/suppliers'));
-
+app.use('/api/auth', require('./routes/authRoutes'))
+app.use('/api', require('./routes/apiRoutes'))
+/*
 // === VUE FRONTEND ===
 app.use(express.static('public'));
 
@@ -29,7 +42,7 @@ app.use(express.static('public'));
 app.use((req, res) => {
   res.sendFile(__dirname + '/public/index.html');
 });
-
+*/
 const startServer = async () => {
   try {
     await sequelize.authenticate();

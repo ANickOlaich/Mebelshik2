@@ -2,6 +2,21 @@ const { User } = require('../models');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
+exports.me = async (req, res) => {
+  try {
+    const user = await User.findByPk(req.user.id, {
+      attributes: ['id', 'username', 'email', 'role']
+    }); 
+    if (!user) {
+      return res.status(404).json({ message: 'Пользователь не найден' });
+    } 
+    res.json( user );
+  } catch (error) {
+    console.error('ME ERROR:', error)
+    res.status(500).json({ message: 'Ошибка сервера', error: error.message })
+  }
+};
+
 exports.register = async (req, res) => {
   try {
     console.log('REGISTER REQUEST BODY:', req.body);
